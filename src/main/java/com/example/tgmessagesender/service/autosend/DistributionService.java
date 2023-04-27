@@ -39,11 +39,11 @@ public class DistributionService {
         sendMessage(botConfig.getAdminChatId(), message.toString());
     }
 
-    public void sendTgMessageToChanel(String message) {
-        //sendMessage(botConfig.getTargetChatId().toString(), message); TODO
+    public void sendTgMessageToAdmin(String message) {
+        sendMessage(botConfig.getAdminChatId().toString(), message);
     }
 
-    private void sendMessage(String chatId, String message){
+    private void sendMessage(String chatId, String message) {
         try {
             SendMessage sendMessage = new SendMessage(chatId, message);
             sendMessage.setParseMode(PARSE_MODE);

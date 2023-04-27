@@ -1,0 +1,14 @@
+{
+  "clientList": [
+    {
+      "apiKey": "79817440814:6bgfPZ9Brnju9EJzjnyqyxsdty3voUZDMmeTNU49",
+      "message": "test 1",
+      "chats": [
+        {
+          "userName": "@grigorievap",
+          "chatId": 799008767
+        }
+		]
+    }
+  ]
+}

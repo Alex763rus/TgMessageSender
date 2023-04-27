@@ -1,6 +1,8 @@
 package com.example.tgmessagesender.config;
 
-import com.example.tgmessagesender.model.WhiteListUser;
+import com.example.tgmessagesender.service.security.Chat;
+import com.example.tgmessagesender.service.security.Client;
+import com.example.tgmessagesender.service.security.SenderSettings;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Data;
 import lombok.SneakyThrows;
@@ -38,13 +40,15 @@ public class BotConfig {
     @Value("${admin.chatid}")
     String adminChatId;
 
+    @Value("${setting.creater.apikey}")
+    String settingCreaterApikey;
+
     @SneakyThrows
     @Bean
-    WhiteListUser whiteListUser() {
-        val currentDir = System.getProperty("user.dir");
-        val filePath = currentDir + "\\" + "WhiteListUsers.json";
+    SenderSettings senderSettings() {
+        val filePath = System.getProperty("user.dir") + "\\" + "SenderSettings.json";
         val objectMapper = new ObjectMapper();
-        val result = objectMapper.readValue(new File(filePath), WhiteListUser.class);
-        return result;
+        val senderSettings = objectMapper.readValue(new File(filePath), SenderSettings.class);
+        return senderSettings;
     }
 }

@@ -5,7 +5,6 @@ public class Constant {
     public static String APP_NAME = "TgMessageSender";
     public static String PARSE_MODE = "Markdown";
 
-
     public static String MESSAGE = "\uD83C\uDF53\uD83C\uDF53 \uD83C\uDF53\uD83C\uDF53 \uD83C\uDF53\uD83C\uDF53 \uD83C\uDF53\uD83C\uDF53\n" +
             "Лучший минет в Петербурге!Душ-коктейль!\uD83D\uDE01 СЛАДКИЙ РОТИК! Ваш ГИД в мире СЕКСА!❤️\uD83D\uDC9C\uD83D\uDC99\uD83D\uDC9A\uD83D\uDC9B\uD83E\uDDE1 В СЕКСЕ ОГОНЬ!\n" +
             "\uD83D\uDD25\uD83D\uDD25\uD83D\uDD25\uD83D\uDD25\uD83D\uDD25\uD83D\uDD25\uD83D\uDD25\n" +
