@@ -1,4 +1,4 @@
-package com.example.tgmessagesender.service.security;
+package com.example.tgmessagesender.model.sender.setting;
 
 import lombok.Getter;
 import lombok.Setter;

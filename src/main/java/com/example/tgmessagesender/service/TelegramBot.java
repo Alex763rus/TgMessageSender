@@ -1,7 +1,7 @@
 package com.example.tgmessagesender.service;
 
 import com.example.tgmessagesender.config.BotConfig;
-import com.example.tgmessagesender.service.security.SenderSettingCreater;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
@@ -42,12 +42,18 @@ public class TelegramBot extends TelegramLongPollingBot {
 
     @Override
     public void onUpdateReceived(Update update) {
-        if(!securityOk(update)){
+        if (!securityOk(update)) {
             return;
         }
-        val senderSetting = senderSettingCreater.createJson(update.getMessage().getText(), botConfig.getSettingCreaterApikey());
-        sendMessage(botConfig.getAdminChatId(), senderSetting.getDescription());
+        try {
+            val json = senderSettingCreater.createJson(update.getMessage().getText(), botConfig.getSettingCreaterApikey());
+            log.info(json);
+            sendMessage(botConfig.getAdminChatId(), json);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
     }
+
     private void sendMessage(String chatId, String message) {
         try {
             SendMessage sendMessage = new SendMessage(chatId, message);
@@ -57,11 +63,12 @@ public class TelegramBot extends TelegramLongPollingBot {
             log.error(e.getMessage());
         }
     }
-    private boolean securityOk(Update update){
-        if(update.hasMessage() && String.valueOf(update.getMessage().getChatId()).equals(botConfig.getAdminChatId())){
+
+    private boolean securityOk(Update update) {
+        if (update.hasMessage() && String.valueOf(update.getMessage().getChatId()).equals(botConfig.getAdminChatId())) {
             return true;
         }
-        if(update.hasCallbackQuery() && String.valueOf(update.getCallbackQuery().getMessage().getChatId()).equals(botConfig.getAdminChatId())){
+        if (update.hasCallbackQuery() && String.valueOf(update.getCallbackQuery().getMessage().getChatId()).equals(botConfig.getAdminChatId())) {
             return true;
         }
         return false;

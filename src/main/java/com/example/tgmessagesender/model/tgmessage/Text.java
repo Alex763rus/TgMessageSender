@@ -1,4 +1,4 @@
-package com.example.tgmessagesender.api.sendmessage;
+package com.example.tgmessagesender.model.tgmessage;
 
 import jakarta.annotation.PostConstruct;
 import lombok.Data;

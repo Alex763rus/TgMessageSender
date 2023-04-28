@@ -1,8 +1,6 @@
 package com.example.tgmessagesender.config;
 
-import com.example.tgmessagesender.service.security.Chat;
-import com.example.tgmessagesender.service.security.Client;
-import com.example.tgmessagesender.service.security.SenderSettings;
+import com.example.tgmessagesender.model.sender.setting.SenderSettings;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Data;
 import lombok.SneakyThrows;

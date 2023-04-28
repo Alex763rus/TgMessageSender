@@ -1,4 +1,4 @@
-package com.example.tgmessagesender.api.searchchat;
+package com.example.tgmessagesender.model.searchchat;
 
 import jakarta.annotation.PostConstruct;
 import lombok.Data;

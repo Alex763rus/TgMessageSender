@@ -1,32 +1,21 @@
-package com.example.tgmessagesender.service.autosend;
+package com.example.tgmessagesender.service;
 
-import com.example.tgmessagesender.service.rest.RestService;
-import com.example.tgmessagesender.service.security.Chat;
-import com.example.tgmessagesender.service.security.Client;
-import com.example.tgmessagesender.service.security.SenderSettings;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.example.tgmessagesender.api.bot.DistributionService;
+import com.example.tgmessagesender.api.rest.RestService;
+import com.example.tgmessagesender.model.sender.setting.Client;
+import com.example.tgmessagesender.model.sender.setting.SenderSettings;
 import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
-import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Arrays;
-import java.util.HashSet;
-
-import static com.example.tgmessagesender.enums.ResponceResult.ERROR;
-
 @Service
 @Slf4j
-public class SenderService implements Runnable {
+public class AutoSenderService implements Runnable {
 
     @Autowired
     private DistributionService distributionService;
-
-    @Autowired
-    private DelayService delayService;
 
     @Autowired
     private SenderSettings senderSettings;
@@ -65,9 +54,9 @@ public class SenderService implements Runnable {
     private void sendOneMessage(Client client) {
         val chat = client.getChats().get(client.getPointer());
         val postResult = restService.sendMessage(client.getApiKey(), String.valueOf(chat.getChatId()), client.getMessage());
-        if (postResult != null && postResult.getResponceResult() == ERROR) {
+        if (postResult != null && postResult.getStatusCode().isError()) {
             val errorMessage = new StringBuilder("Ошибка во время отправки сообщения:");
-            errorMessage.append(postResult.getDescription()).append(" Чат:").append(chat);
+            errorMessage.append(postResult.getBody()).append(" Чат:").append(chat);
             log.error(errorMessage.toString());
             distributionService.sendTgMessageToAdmin(errorMessage.toString());
         }

@@ -11,6 +11,8 @@ import org.telegram.telegrambots.meta.TelegramBotsApi;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.updatesreceivers.DefaultBotSession;
 
+import static com.example.tgmessagesender.constant.Constant.APP_NAME;
+
 @Component
 @Slf4j
 public class BotInitializer {
@@ -19,12 +21,12 @@ public class BotInitializer {
     private TelegramBot telegramBot;
 
     @EventListener({ContextRefreshedEvent.class})
-    public  void init() throws TelegramApiException{
+    public void init() throws TelegramApiException {
         val telegramBotsApi = new TelegramBotsApi(DefaultBotSession.class);
-        try{
+        try {
             telegramBotsApi.registerBot(telegramBot);
-        }
-        catch (TelegramApiException e){
+            System.out.println("APPNAME: " + APP_NAME);
+        } catch (TelegramApiException e) {
             log.error("Error occurred: " + e.getMessage());
         }
     }

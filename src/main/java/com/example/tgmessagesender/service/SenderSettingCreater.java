@@ -1,7 +1,9 @@
-package com.example.tgmessagesender.service.security;
+package com.example.tgmessagesender.service;
 
-import com.example.tgmessagesender.api.responce.PostResult;
-import com.example.tgmessagesender.service.rest.RestService;
+import com.example.tgmessagesender.api.rest.RestService;
+import com.example.tgmessagesender.model.sender.setting.Chat;
+import com.example.tgmessagesender.model.sender.setting.Client;
+import com.example.tgmessagesender.model.sender.setting.SenderSettings;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
@@ -13,8 +15,6 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-import static com.example.tgmessagesender.enums.ResponceResult.ERROR;
-import static com.example.tgmessagesender.enums.ResponceResult.OK;
 
 @Service
 @Slf4j
@@ -23,7 +23,7 @@ public class SenderSettingCreater {
     @Autowired
     private RestService restService;
 
-    public PostResult createJson(String tgNiks, String apiKey) {
+    public String createJson(String tgNiks, String apiKey) throws JsonProcessingException {
         val users = tgNiks.replace("https://t.me/", "@").replace("\r\n", ",").split(",");
         val senderSettings = new SenderSettings();
         val client = new Client();
@@ -35,31 +35,22 @@ public class SenderSettingCreater {
         val objectMapper = new ObjectMapper();
         for (String user : users) {
             val postResult = restService.getChatInfo(apiKey, user);
-            if (postResult != null && postResult.getResponceResult() == ERROR) {
+            if (postResult != null && postResult.getStatusCode().isError()) {
                 val errorMessage = new StringBuilder("Ошибка во время отправки сообщения:");
-                errorMessage.append(postResult.getDescription()).append(" Чат:").append(user);
+                errorMessage.append(postResult.getBody()).append(" Чат:").append(user);
                 log.error(errorMessage.toString());
             } else {
                 try {
-                    JSONObject jsonObject = new JSONObject(postResult.getDescription());
+                    JSONObject jsonObject = new JSONObject(postResult.getBody());
                     val chat = new Chat();
                     chat.setUserName(user);
                     chat.setChatId(jsonObject.getLong("id"));
                     chats.add(chat);
                 } catch (Exception ex) {
-                    log.error("Ошибка при поиске ID. Сообщение:" + postResult.getDescription());
+                    log.error("Ошибка при поиске ID. Сообщение:" + postResult.getBody());
                 }
             }
         }
-        try {
-            log.info(objectMapper.writeValueAsString(senderSettings));
-            return PostResult.init().setResponceResult(OK)
-                    .setDescription("OK")
-                    .build();
-        } catch (JsonProcessingException e) {
-            return PostResult.init().setResponceResult(ERROR)
-                    .setDescription("Ошибка во время парсинга контактов: " + e.getMessage())
-                    .build();
-        }
+        return objectMapper.writeValueAsString(senderSettings);
     }
 }

@@ -1,4 +1,4 @@
-package com.example.tgmessagesender.service.autosend;
+package com.example.tgmessagesender.api.bot;
 
 import com.example.tgmessagesender.config.BotConfig;
 import com.example.tgmessagesender.enums.Emoji;
