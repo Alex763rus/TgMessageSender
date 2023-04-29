@@ -1,14 +1,28 @@
 {
   "clientList": [
     {
+      "chatIdOwner": "799008767",
+      "enabled": false,
       "apiKey": "18473783694:YEhmHJw2GC_-WL5RXXKsfxw5NwLTzwxLeF14k8gp",
-      "message": "TEST",
+      "message": "TEST 799008767",
       "chats": [
         {
           "userName": "@grigorievap",
           "chatId": 799008767
         }
-		]
-    }
+      ]
+    },
+    {
+      "chatIdOwner": "1635087180",
+      "enabled": false,
+      "apiKey": "18473783694:YEhmHJw2GC_-WL5RXXKsfxw5NwLTzwxLeF14k8gp",
+      "message": "TEST 1635087180",
+      "chats": [
+        {
+          "userName": "@grigorievap",
+          "chatId": 799008767
+        }
+      ]
+    }	
   ]
 }

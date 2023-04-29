@@ -11,6 +11,9 @@ import java.util.List;
 @ToString
 public class Client {
 
+    private String chatIdOwner;
+
+    private volatile boolean enabled;
     private String apiKey;
 
     private String message;

@@ -1,15 +1,21 @@
 package com.example.tgmessagesender.service;
 
 import com.example.tgmessagesender.config.BotConfig;
-import com.fasterxml.jackson.core.JsonProcessingException;
+import com.example.tgmessagesender.model.security.WhiteListUser;
+import com.example.tgmessagesender.service.menu.menuService;
 import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
+import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
+import org.telegram.telegrambots.meta.api.methods.commands.SetMyCommands;
+import org.telegram.telegrambots.meta.api.methods.send.SendDocument;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
+import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;
 import org.telegram.telegrambots.meta.api.objects.Update;
+import org.telegram.telegrambots.meta.api.objects.commands.scope.BotCommandScopeDefault;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import static com.example.tgmessagesender.constant.Constant.PARSE_MODE;
@@ -23,10 +29,16 @@ public class TelegramBot extends TelegramLongPollingBot {
     private BotConfig botConfig;
 
     @Autowired
-    private SenderSettingCreater senderSettingCreater;
+    private menuService menuService;
+
 
     @PostConstruct
     public void init() {
+        try {
+            execute(new SetMyCommands(menuService.getMainMenuComands(), new BotCommandScopeDefault(), null));
+        } catch (TelegramApiException e) {
+            log.error("Error setting bot's command list: " + e.getMessage());
+        }
         log.info("==" + "Server was starded. Version: " + botConfig.getBotVersion() + "==================================================================================================");
     }
 
@@ -42,18 +54,31 @@ public class TelegramBot extends TelegramLongPollingBot {
 
     @Override
     public void onUpdateReceived(Update update) {
-        if (!securityOk(update)) {
-            return;
+        val answers = menuService.messageProcess(update);
+        for (val answer : answers) {
+            try {
+                if (answer instanceof BotApiMethod) {
+                    execute((BotApiMethod) answer);
+                }
+                if (answer instanceof SendDocument) {
+                    deleteLastMessage(update);
+                    execute((SendDocument) answer);
+                }
+            } catch (TelegramApiException e) {
+                log.error("Ошибка во время обработки сообщения: " + e.getMessage());
+            }
         }
-        try {
-            val json = senderSettingCreater.createJson(update.getMessage().getText(), botConfig.getSettingCreaterApikey());
-            log.info(json);
-            sendMessage(botConfig.getAdminChatId(), json);
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
-        }
-    }
 
+    }
+    private void deleteLastMessage(Update update) throws TelegramApiException {
+        EditMessageText editMessageText = new EditMessageText();
+        long messageId = update.getCallbackQuery().getMessage().getMessageId();
+        long chatId = update.getCallbackQuery().getMessage().getChatId();
+        editMessageText.setChatId(String.valueOf(chatId));
+        editMessageText.setMessageId((int) messageId);
+        editMessageText.setText("Документ готов!");
+        execute(editMessageText);
+    }
     private void sendMessage(String chatId, String message) {
         try {
             SendMessage sendMessage = new SendMessage(chatId, message);
@@ -64,13 +89,5 @@ public class TelegramBot extends TelegramLongPollingBot {
         }
     }
 
-    private boolean securityOk(Update update) {
-        if (update.hasMessage() && String.valueOf(update.getMessage().getChatId()).equals(botConfig.getAdminChatId())) {
-            return true;
-        }
-        if (update.hasCallbackQuery() && String.valueOf(update.getCallbackQuery().getMessage().getChatId()).equals(botConfig.getAdminChatId())) {
-            return true;
-        }
-        return false;
-    }
+
 }

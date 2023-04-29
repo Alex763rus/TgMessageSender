@@ -10,6 +10,8 @@ import lombok.val;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import static javax.management.timer.Timer.ONE_HOUR;
+
 @Service
 @Slf4j
 public class AutoSenderService implements Runnable {
@@ -32,16 +34,19 @@ public class AutoSenderService implements Runnable {
     @Override
     public void run() {
         val maxCountChat = getMaxCountChat();
-        Long delay = 1000L * 60L * 60L / maxCountChat;
+        Long delay = ONE_HOUR / maxCountChat;
         try {
             while (true) {
                 log.info("Start send message process.");
                 for (Client client : senderSettings.getClientList()) {
                     if (client.getChats().size() == client.getPointer()) {
                         client.setPointer(0);
+                        log.info("Закончился список контактов для клиента:" + client.getChatIdOwner());
                     }
-                    sendOneMessage(client);
-                    client.setPointer(client.getPointer() + 1);
+                    if (client.isEnabled()) {
+                        sendOneMessage(client);
+                        client.setPointer(client.getPointer() + 1);
+                    }
                 }
                 log.info("End post request process. Next post request after:" + delay);
                 Thread.sleep(delay);
@@ -53,10 +58,12 @@ public class AutoSenderService implements Runnable {
 
     private void sendOneMessage(Client client) {
         val chat = client.getChats().get(client.getPointer());
-        val postResult = restService.sendMessage(client.getApiKey(), String.valueOf(chat.getChatId()), client.getMessage());
-        if (postResult != null && postResult.getStatusCode().isError()) {
+        try {
+            log.info("Try send:" + client.getApiKey() + " " + chat.getChatId() + " " + chat.getUserName());
+            restService.sendMessage(client.getApiKey(), String.valueOf(chat.getChatId()), client.getMessage());
+        } catch (Exception e) {
             val errorMessage = new StringBuilder("Ошибка во время отправки сообщения:");
-            errorMessage.append(postResult.getBody()).append(" Чат:").append(chat);
+            errorMessage.append(e.getMessage()).append(" Чат:").append(chat);
             log.error(errorMessage.toString());
             distributionService.sendTgMessageToAdmin(errorMessage.toString());
         }
