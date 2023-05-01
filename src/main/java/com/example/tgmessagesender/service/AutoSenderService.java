@@ -35,9 +35,9 @@ public class AutoSenderService implements Runnable {
     public void run() {
         val maxCountChat = getMaxCountChat();
         Long delay = ONE_HOUR / maxCountChat;
+        log.info("Время между сообщениями: " + delay);
         try {
             while (true) {
-                log.info("Start send message process.");
                 for (Client client : senderSettings.getClientList()) {
                     if (client.getChats().size() == client.getPointer()) {
                         client.setPointer(0);
@@ -48,7 +48,6 @@ public class AutoSenderService implements Runnable {
                         client.setPointer(client.getPointer() + 1);
                     }
                 }
-                log.info("End post request process. Next post request after:" + delay);
                 Thread.sleep(delay);
             }
         } catch (InterruptedException e) {

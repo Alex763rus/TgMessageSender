@@ -17,7 +17,7 @@ import java.util.List;
 
 @Slf4j
 @Service
-public class menuService {
+public class MenuService {
 
     @Autowired
     private MenuStart menuStart;

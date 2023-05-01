@@ -1,8 +1,7 @@
 package com.example.tgmessagesender.service;
 
 import com.example.tgmessagesender.config.BotConfig;
-import com.example.tgmessagesender.model.security.WhiteListUser;
-import com.example.tgmessagesender.service.menu.menuService;
+import com.example.tgmessagesender.service.menu.MenuService;
 import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
@@ -29,7 +28,7 @@ public class TelegramBot extends TelegramLongPollingBot {
     private BotConfig botConfig;
 
     @Autowired
-    private menuService menuService;
+    private MenuService menuService;
 
 
     @PostConstruct

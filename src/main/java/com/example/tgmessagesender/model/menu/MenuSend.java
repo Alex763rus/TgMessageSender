@@ -14,6 +14,8 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 import java.util.Arrays;
 import java.util.List;
 
+import static com.example.tgmessagesender.constant.Constant.SPACE;
+
 @Component
 @Slf4j
 public class MenuSend extends Menu {
@@ -33,16 +35,18 @@ public class MenuSend extends Menu {
                 .filter(e -> e.getChatIdOwner().equals(user.getChatId()))
                 .findFirst().get();
         client.setEnabled(true);
+        val messageText ="Рассылка запущена";
+        log.info(messageText + SPACE + user.getChatId());
         return Arrays.asList(
                 SendMessageWrap.init()
                         .setChatIdLong(update.getMessage().getChatId())
-                        .setText("Рассылка запущена")
+                        .setText(messageText)
                         .build().createSendMessage());
     }
 
     @Override
     public String getDescription() {
-        return MENU_NAME;
+        return "Включить рассылку";
     }
 
 }
