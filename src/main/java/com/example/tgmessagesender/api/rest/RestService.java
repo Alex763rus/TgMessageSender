@@ -1,9 +1,8 @@
 package com.example.tgmessagesender.api.rest;
 
-import com.example.tgmessagesender.model.searchchat.SearchPublicChats;
-import com.example.tgmessagesender.model.tgmessage.SendTgMessage;
+import com.example.tgmessagesender.config.BotConfig;
+import com.example.tgmessagesender.model.telegrammService.TgMessage;
 import com.example.tgmessagesender.model.tgmessage.Text;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
@@ -16,36 +15,27 @@ import org.springframework.web.client.RestTemplate;
 @Slf4j
 public class RestService {
 
-    private final String URL = "https://api.tdlib.org/client";
+    @Autowired
+    BotConfig botConfig;
 
     @Autowired
-    SendTgMessage sendTgMessage;
-
+    TgMessage tgMessage;
     @Autowired
     Text text;
 
-    @Autowired
-    SearchPublicChats searchPublicChats;
-
-    public ResponseEntity<String> getChatInfo(String apiKey, String userName) throws Exception {
-        searchPublicChats.setUsername(userName);
-        searchPublicChats.setApi_key(apiKey);
-        return sendPostRequest(searchPublicChats);
-    }
-
     public ResponseEntity<String> sendMessage(String apiKey, String chatId, String message) throws Exception {
-        sendTgMessage.setChat_id(chatId);
-        sendTgMessage.setApi_key(apiKey);
-        text.setText(message);
-        return sendPostRequest(sendTgMessage);
+        tgMessage.setApiId(Long.parseLong(apiKey));
+        tgMessage.setChatId(Long.parseLong(chatId));
+        tgMessage.setMessage(message);
+        return sendPostRequest("sendMessage", HttpMethod.POST, tgMessage);
     }
 
-    private ResponseEntity<String> sendPostRequest(Object obj) throws Exception {
+    private ResponseEntity<String> sendPostRequest(String endPoint, HttpMethod httpMethod, Object obj) throws Exception {
         val restTemplate = new RestTemplate();
         val json = (new ObjectMapper().writeValueAsString(obj)).replace("\"type\"", "\"@type\"");
         val headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         val httpEntity = new HttpEntity<>(json, headers);
-        return restTemplate.exchange(URL, HttpMethod.POST, httpEntity, String.class);
+        return restTemplate.exchange(botConfig.getTelegrammSenderServiceApi() + endPoint, httpMethod, httpEntity, String.class);
     }
 }

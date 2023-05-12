@@ -37,6 +37,7 @@ public class MenuStop extends Menu {
         val messageText = "Рассылка остановлена";
         log.info(messageText + SPACE + user.getChatId());
         return Arrays.asList(
+                createAdminMessage(messageText + ": " + user.getChatId()),
                 SendMessageWrap.init()
                         .setChatIdLong(update.getMessage().getChatId())
                         .setText(messageText)

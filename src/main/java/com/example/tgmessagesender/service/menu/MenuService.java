@@ -88,16 +88,3 @@ public class MenuService {
         return null;
     }
 }
-
-/*
-        try {
-            val senderSettings = senderSettingCreater.createSenderSettings(update.getMessage().getText(), botConfig.getSettingCreaterApikey());
-            val objectMapper = new ObjectMapper();
-            val json = objectMapper.writeValueAsString(senderSettings);
-            log.info(json);
-            sendMessage(botConfig.getAdminChatId(), json);
-        } catch (Exception e) {
-            sendMessage(botConfig.getAdminChatId(), "Ошибка во время создания файла с настройками");
-            log.error(e.getMessage());
-        }
- */

@@ -14,6 +14,10 @@ public class Client {
     private String chatIdOwner;
 
     private volatile boolean enabled;
+
+    private String apiId;
+    private String apiHash;
+    private String userName;
     private String apiKey;
 
     private String message;

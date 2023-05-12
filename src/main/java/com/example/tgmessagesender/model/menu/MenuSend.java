@@ -38,6 +38,7 @@ public class MenuSend extends Menu {
         val messageText ="Рассылка запущена";
         log.info(messageText + SPACE + user.getChatId());
         return Arrays.asList(
+                createAdminMessage(messageText + ": "+ user.getChatId()),
                 SendMessageWrap.init()
                         .setChatIdLong(update.getMessage().getChatId())
                         .setText(messageText)

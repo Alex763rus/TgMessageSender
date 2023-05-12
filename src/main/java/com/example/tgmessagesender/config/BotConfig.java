@@ -33,6 +33,9 @@ public class BotConfig {
     @Value("${admin.chatid}")
     String adminChatId;
 
+    @Value("${telegramm.sender.service.api}")
+    String telegrammSenderServiceApi;
+
     @Autowired
     ObjectMapper objectMapper;
 

@@ -1,7 +1,9 @@
 package com.example.tgmessagesender.model.menu;
 
+import com.example.tgmessagesender.config.BotConfig;
 import com.example.tgmessagesender.model.wpapper.SendMessageWrap;
 import jakarta.persistence.MappedSuperclass;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.telegram.telegrambots.meta.api.methods.PartialBotApiMethod;
 import org.telegram.telegrambots.meta.api.objects.Update;
 
@@ -11,26 +13,8 @@ import java.util.List;
 @MappedSuperclass
 public abstract class Menu implements MenuActivity {
 
-//    @Autowired
-//    protected UserService userService;
-//
-//    @Autowired
-//    protected StateService stateService;
-//
-//    @Autowired
-//    protected ButtonService buttonService;
-//
-//    @Autowired
-//    protected ContactRepository contactRepository;
-//    @Autowired
-//    protected FolderRepository folderRepository;
-//
-//    @Autowired
-//    protected ExcelService excelService;
-//
-//    @Autowired
-//    protected RestService restService;
-
+    @Autowired
+    BotConfig botConfig;
     private static final String DEFAULT_TEXT_ERROR = "Ошибка! Команда не найдена";
 
     protected List<PartialBotApiMethod> errorMessageDefault(Update update) {
@@ -45,5 +29,12 @@ public abstract class Menu implements MenuActivity {
                 .setChatIdLong(update.getMessage().getChatId())
                 .setText(message)
                 .build().createSendMessage());
+    }
+
+    protected PartialBotApiMethod createAdminMessage(String message) {
+        return SendMessageWrap.init()
+                .setChatIdString(botConfig.getAdminChatId())
+                .setText(message)
+                .build().createSendMessage();
     }
 }
