@@ -19,6 +19,7 @@ public class Client {
     private String apiHash;
     private String userName;
     private String apiKey;
+    private String endPoint;
 
     private String message;
 

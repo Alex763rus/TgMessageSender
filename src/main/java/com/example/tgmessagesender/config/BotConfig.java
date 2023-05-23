@@ -33,8 +33,8 @@ public class BotConfig {
     @Value("${admin.chatid}")
     String adminChatId;
 
-    @Value("${telegramm.sender.service.api}")
-    String telegrammSenderServiceApi;
+    @Value("${message.delay}")
+    Long messageDelay;
 
     @Autowired
     ObjectMapper objectMapper;

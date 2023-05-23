@@ -23,19 +23,20 @@ public class RestService {
     @Autowired
     Text text;
 
-    public ResponseEntity<String> sendMessage(String apiKey, String chatId, String message) throws Exception {
+    public ResponseEntity<String> sendMessage(String apiKey, String login, String message, String endPoint) throws Exception {
         tgMessage.setApiId(Long.parseLong(apiKey));
-        tgMessage.setChatId(Long.parseLong(chatId));
+        tgMessage.setLogin(login);
         tgMessage.setMessage(message);
-        return sendPostRequest("sendMessage", HttpMethod.POST, tgMessage);
+        return sendPostRequest(endPoint, HttpMethod.POST, tgMessage);
     }
 
     private ResponseEntity<String> sendPostRequest(String endPoint, HttpMethod httpMethod, Object obj) throws Exception {
         val restTemplate = new RestTemplate();
         val json = (new ObjectMapper().writeValueAsString(obj)).replace("\"type\"", "\"@type\"");
         val headers = new HttpHeaders();
+//        log.info("endPoint:" + endPoint + ", post json:" + json + ", tgMessage=" + obj);
         headers.setContentType(MediaType.APPLICATION_JSON);
         val httpEntity = new HttpEntity<>(json, headers);
-        return restTemplate.exchange(botConfig.getTelegrammSenderServiceApi() + endPoint, httpMethod, httpEntity, String.class);
+        return restTemplate.exchange(endPoint, httpMethod, httpEntity, String.class);
     }
 }

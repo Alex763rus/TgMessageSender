@@ -2,6 +2,7 @@ package com.example.tgmessagesender.service;
 
 import com.example.tgmessagesender.api.bot.DistributionService;
 import com.example.tgmessagesender.api.rest.RestService;
+import com.example.tgmessagesender.config.BotConfig;
 import com.example.tgmessagesender.exception.TelegrammServiceException;
 import com.example.tgmessagesender.model.responce.PostResult;
 import com.example.tgmessagesender.model.sender.setting.Client;
@@ -31,6 +32,9 @@ public class AutoSenderService implements Runnable {
     private RestService restService;
 
     @Autowired
+    private BotConfig botConfig;
+
+    @Autowired
     ObjectMapper objectMapper;
 
     @PostConstruct
@@ -42,13 +46,9 @@ public class AutoSenderService implements Runnable {
 
     @Override
     public void run() {
-        val maxCountChat = getMaxCountChat();
-        val delayCheckCommand = 10000;
-        Long delay = ONE_HOUR / maxCountChat;
-        log.info("Время между сообщениями: " + delay);
+        log.info("Время между сообщениями: " + botConfig.getMessageDelay());
         try {
             while (true) {
-                boolean hasEnabledClient = false;
                 for (Client client : senderSettings.getClientList()) {
                     if (client.getChats().size() == client.getPointer()) {
                         client.setPointer(0);
@@ -57,14 +57,9 @@ public class AutoSenderService implements Runnable {
                     if (client.isEnabled()) {
                         sendOneMessage(client);
                         client.setPointer(client.getPointer() + 1);
-                        hasEnabledClient = true;
                     }
                 }
-                if (hasEnabledClient) {
-                    Thread.sleep(delay);
-                } else {
-                    Thread.sleep(delayCheckCommand);
-                }
+                Thread.sleep(botConfig.getMessageDelay());
             }
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
@@ -75,7 +70,7 @@ public class AutoSenderService implements Runnable {
         val chat = client.getChats().get(client.getPointer());
         try {
             log.info("Try send:" + client.getApiId() + " " + chat.getChatId() + " " + chat.getUserName());
-            val responce = restService.sendMessage(client.getApiId(), String.valueOf(chat.getChatId()), client.getMessage());
+            val responce = restService.sendMessage(client.getApiId(), chat.getUserName(), client.getMessage(), client.getEndPoint());
             val postResult = objectMapper.readValue(responce.getBody(), PostResult.class);
             if(postResult.getPostResultCode() != 0){
                 throw new TelegrammServiceException(postResult.toString());
@@ -88,13 +83,4 @@ public class AutoSenderService implements Runnable {
         }
     }
 
-    private int getMaxCountChat() {
-        int maxChats = 0;
-        for (Client client : senderSettings.getClientList()) {
-            if (client.getChats().size() > maxChats) {
-                maxChats = client.getChats().size();
-            }
-        }
-        return maxChats;
-    }
 }

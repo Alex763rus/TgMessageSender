@@ -7,15 +7,15 @@ import org.springframework.stereotype.Component;
 @Data
 public class TgMessage {
     private Long apiId;
-    private Long chatId;
+    private String login;
     private String message;
 
     @Override
     public String toString() {
         return "TgMessage{" +
                 "apiId=" + apiId +
-                ", chatId=" + chatId +
-                ", message='" + message + '\'' +
+                ", login=" + login +
+                ", message=" + message +
                 '}';
     }
 }
